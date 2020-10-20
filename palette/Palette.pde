@@ -17,6 +17,22 @@ Ivy bus;
 PFont f;
 String message= "";
 
+float CONFIDENCE = 0.5; // valeur de confiance de sra
+
+// action vocale ou gestuelle avec la leap motion 
+boolean action_deplacer = false;
+boolean action_creer = false; 
+
+// figure sur dollar 
+String figure_dollar = "";
+
+// position vocale (clique souris sur la palette ou vocale(en haut...))
+float position_x = 0;
+float position_y = 0;
+
+// couleur (clique souris sur la palette ou vocale)
+String couleur = "";
+
 
 void setup() {
   size(800,600);
@@ -30,21 +46,68 @@ void setup() {
   noStroke();
   mae = FSM.INITIAL;
   indice_forme = -1;
-  
-  try {
-    bus = new Ivy("palette", " palette is ready", null);
+
+  // recevoir tous les messages 
+  try{
+    bus = new Ivy("Palette", " Palette is ready", null);
     bus.start("127.255.255.255:2010");
     
-    bus.bindMsg("^FinalCommand Command=(.*)", new IvyMessageListener() {
-      public void receive(IvyClient client,String[] args) {
-        message = args[0];
-        print("Message recu : " + message + "\n");
-       }        
+    //Leap motion
+    bus.bindMsg("^leap_motion Command=(.*)", new IvyMessageListener()
+    {
+      public void receive(IvyClient client,String[] args)
+      { 
+        message = args[0]; 
+        if(message=="case1"){
+          action_creer = true;
+        }
+        if(message=="case2"){
+          action_deplacer = true;
+        }  
+      }        
     });
+
+    //sra5
+    bus.bindMsg("^sra5 Parsed=(.*) Confidence=(.*) NP=.*", new IvyMessageListener()
+      {
+        public void receive(IvyClient client,String[] args)
+        {
+          message = "Vous avez prononcé les concepts : " + args[0] + " avec un taux de confiance de " + args[1];
+          
+          if (float(args[1].replace(',', '.')) > CONFIDENCE){
+            println(message);
+            // TODO 
+          }
+          
+        }        
+      });
     
-  } catch (IvyException ie) {
-  }
-  
+    //sra5 rejected
+    bus.bindMsg("^sra5 Event=Speech_Rejected", new IvyMessageListener()
+      {
+        public void receive(IvyClient client,String[] args)
+        {
+          message = "Malheureusement, je ne vous ai pas compris"; 
+          println(message);
+        }        
+      });
+    
+    //OneDollar
+    bus.bindMsg("^OneDolarIvy Template=(.*) Confidence=(.*)", new IvyMessageListener()
+      {
+        public void receive(IvyClient client,String[] args)
+        {
+          message = "Dessin:" + args[0] + " et confiance:" + args[1];
+          
+          if (float(args[1].replace(',', '.')) > CONFIDENCE){
+            println(message);
+            // TODO
+            }
+          }
+        }        
+      });
+
+  } catch(IvyException e){ println(e)}
 }
 
 void draw() {
