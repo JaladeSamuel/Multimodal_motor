@@ -102,12 +102,11 @@ void setup() {
           if (float(args[1].replace(',', '.')) > CONFIDENCE){
             println(message);
             // TODO
-            }
           }
         }        
       });
 
-  } catch(IvyException e){ println(e)}
+  } catch(IvyException e){ println(e); }
 }
 
 void draw() {
