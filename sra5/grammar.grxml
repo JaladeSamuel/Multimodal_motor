@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE grammar PUBLIC "-//W3C//DTD GRAMMAR 1.0//EN"
+                "grammar.dtd">
+<!-- the default grammar language is FR  -->
+<grammar  version="1.0"
+          mode ="voice"
+          xmlns="http://www.w3.org/2001/06/grammar"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.w3.org/2001/06/grammar
+                              grammar.xsd"
+          xml:lang="fr-FR" root="answer" tag-format="semantics/1.0">
+     
+
+<rule id="answer" scope="public">
+	<tag>out.action = ""; out.couleur = "" ; out.pos = "";</tag>
+	<one-of>
+		<item> supprimer <tag>out.action = "action:supprimer";</tag> </item> 
+		<item> <ruleref uri="#creer" /> <tag>out.action = rules.latest().text;</tag> </item>
+		<item>
+			<tag>out.pos = "pose:aleatoire ";</tag>
+			<item> deplacer <tag>out.action= "action:deplacer";</tag> </item>
+			<item repeat="0-1"> <ruleref uri="#pose" /> <tag>out.pos = rules.latest().text;</tag> </item>
+		</item>
+		<item>
+			<tag>out.couleur = "couleur:aleatoire " ; out.pos = "POSITION:aleatoire ";</tag>
+			<item repeat="0-1"> <ruleref uri="#color" /> <tag>out.couleur = rules.latest().text;</tag> </item>
+			<item repeat="0-1"> <ruleref uri="#pose" /> <tag>out.pos = rules.latest().text;</tag> </item>
+		</item>
+	</one-of>
+	<tag>out = out.action + out.couleur + out.pos</tag>
+	<ruleref special="GARBAGE" />
+</rule>  
+  
+ <rule id="creer">
+    <one-of>
+		<item>creer<tag>out.text = "action:creer ";</tag> </item>
+		<item>mettre <tag>out.text = "action:creer ";</tag> </item>
+    </one-of>
+  </rule>
+
+  
+<rule id="pose">
+    <one-of>
+		<item>ici <tag>out.text = "pose:ici ";</tag> </item>
+		<item>en haut <tag>out.text = "pose:haut ";</tag> </item>
+		<item>en bas <tag>out.text = "pose:bas ";</tag> </item>
+		<item>a gauche <tag>out.text = "pose:gauche ";</tag> </item>
+		<item>a droite <tag>out.text = "pose:droite ";</tag> </item>
+    </one-of> 
+	<tag>out.text = "pose:" + meta.current().text + " ";</tag>
+ </rule>
+
+ <rule id="color">
+    <one-of>
+      <item>vert</item>
+	  <item>rouge</item>
+      <item>bleu</item>
+	  <item>de cette couleur</item>
+    </one-of>
+	<tag>out.text = "couleur:" + meta.current().text + " ";</tag>
+</rule>
+</grammar>
