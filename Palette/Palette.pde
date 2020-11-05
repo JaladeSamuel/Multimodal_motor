@@ -17,7 +17,8 @@ Ivy bus;
 PFont f;
 String message= "";
 
-float CONFIDENCE = 0.5; // valeur de confiance de sra
+float CONFIDENCE = 0.7; // valeur de confiance de sra
+float CONFIDENCE_ONEDOLLAR = 0.8; // valeur de confiance de OneDollar
 
 // action vocale ou gestuelle avec la leap motion 
 boolean action_deplacer = false;
@@ -44,7 +45,7 @@ void setup() {
   
   formes= new ArrayList(); // nous créons une liste vide
   noStroke();
-  mae = FSM.INITIAL;
+  mae = FSM.ECOUTE_INIT;
   indice_forme = -1;
 
   // recevoir tous les messages 
@@ -74,13 +75,69 @@ void setup() {
         {
           message = "Vous avez prononcé les concepts : " + args[0] + " avec un taux de confiance de " + args[1];
           
-          if (float(args[1].replace(',', '.')) > CONFIDENCE){
+          if(float(args[1].replace(',', '.')) > CONFIDENCE) {
             println(message);
-            // TODO 
+            // GO Attente figure dollar
+              switch (mae) {
+
+                case ECOUTE_INIT:  // Etat INITIAL
+                  if(args[0].contains("creer")) {
+                    mae=FSM.ATTENTE_DOLLAR;
+                  }
+                  break;
+                case ATTENTE_COL_POS:
+                  String[] param = args[0].split(" ", 2); //envie de gerber 
+                  if(param[0].contains("couleur:aleatoire") && param[1].contains("pose")) { //Couleur aleatoire position donnee
+                    if(param[1].contains("haut")) {
+                      int x = 400;
+                      int y = 100;
+                      Point p = new Point(x, y);
+                      print(formes.get(formes.size() - 1).toString());
+                      formes.get(formes.size() - 1).setLocation(p);
+                      formes.get(formes.size() - 1).setColor(color(random(0,255),random(0,255),random(0,255)));
+                      print(formes.get(formes.size() - 1).toString());
+                    } else if(param[1].contains("bas")) {
+                    
+                    } else if(param[1].contains("droite")) {
+                      
+                    } else {
+                    
+                    }
+                  } else if(!(param[0].contains("aleatoire")) && param[1].contains("position")) { //Couleur donnee position aleatoire
+                    if(param[1].contains("haut")) {
+                      
+                    } else if(param[1].contains("bas")) {
+                    
+                    } else if(param[1].contains("droite")) {
+                      
+                    } else {
+                    
+                    }
+                  } else if(!(param[0].contains("aleatoire")) && !(param[0].contains("aleatoire"))) { //Couleur et pos donnees
+                    
+                  } else {  //Couleur et pos aleatoire
+                    //Point aleatoire deja instancie dans le bind OneDollar
+                    print("Tout aléatoire");
+                    
+                  }
+                  mae=FSM.AFFICHER_FORMES;
+                  break;
+                  
+                case AFFICHER_FORMES:
+                  break;
+                case ATTENTE_DOLLAR:
+                  break;
+                case DEPLACER_FORMES_SELECTION: 
+                  break;
+                case DEPLACER_FORMES_DESTINATION: 
+                  break;
+                case INITIAL:
+                  break;
+              }
           }
           
         }        
-      });
+      }); //fin bind
     
     //sra5 rejected
     bus.bindMsg("^sra5 Event=Speech_Rejected", new IvyMessageListener()
@@ -99,9 +156,25 @@ void setup() {
         {
           message = "Dessin:" + args[0] + " et confiance:" + args[1];
           
-          if (float(args[1].replace(',', '.')) > CONFIDENCE){
+          if (float(args[1].replace(',', '.')) > CONFIDENCE_ONEDOLLAR){
             println(message);
-            // TODO
+            if(mae == FSM.ATTENTE_DOLLAR){
+              int rand_x = (int)(Math.random() * (750 - 50 + 1) + 50);
+              int rand_y = (int)(Math.random() * (550 - 50 + 1) + 50);
+              Point p = new Point(rand_x,rand_y);
+              
+              if(args[0].contains("rectangle")) {
+                Forme f = new Rectangle(p);
+                formes.add(f);
+                
+                mae = FSM.ATTENTE_COL_POS;
+              } else if (args[0].contains("circle")) {
+                Forme f2 = new Cercle(p);
+                formes.add(f2);
+                
+                mae = FSM.ATTENTE_COL_POS;
+              }
+            }
           }
         }        
       });
@@ -121,10 +194,22 @@ void draw() {
       text("click sur un objet pour changer sa couleur de manière aléatoire", 50,110);
       break;
       
+    case ECOUTE_INIT: // ECOUTE SRA
+      background(255);
+      fill(0);
+      //print("ATTENTE D UNE ACTION\n");
+      break;
+    case ATTENTE_DOLLAR:
+     // print("ATTENTE DOLLAR\n");
+      break;
+    case ATTENTE_COL_POS:
+      //print("ATTENTE COULEUR et/ou POSITION\n");
+      break;
     case AFFICHER_FORMES:  // 
     case DEPLACER_FORMES_SELECTION: 
     case DEPLACER_FORMES_DESTINATION: 
       affiche();
+      
       break;   
       
     default:
