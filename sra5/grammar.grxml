@@ -18,11 +18,11 @@
 		<item> <ruleref uri="#creer" /> <tag>out.action = rules.latest().text;</tag> </item>
 		<item>
 			<tag>out.pos = "pose:aleatoire ";</tag>
-			<item> deplacer <tag>out.action= "action:deplacer";</tag> </item>
+			<item> deplacer <tag>out.action= "action:deplacer ";</tag> </item>
 			<item repeat="0-1"> <ruleref uri="#pose" /> <tag>out.pos = rules.latest().text;</tag> </item>
 		</item>
 		<item>
-			<tag>out.couleur = "couleur:aleatoire " ; out.pos = "POSITION:aleatoire ";</tag>
+			<tag>out.couleur = "couleur:aleatoire " ; out.pos = "position:aleatoire ";</tag>
 			<item repeat="0-1"> <ruleref uri="#color" /> <tag>out.couleur = rules.latest().text;</tag> </item>
 			<item repeat="0-1"> <ruleref uri="#pose" /> <tag>out.pos = rules.latest().text;</tag> </item>
 		</item>
