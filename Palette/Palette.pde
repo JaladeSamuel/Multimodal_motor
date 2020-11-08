@@ -9,6 +9,7 @@ import java.awt.Point;
 import fr.dgac.ivy.*;
 
 ArrayList<Forme> formes; // liste de formes stockées
+Forme temp_forme; // forme en attente d'affichage
 FSM mae; // Finite Sate Machine
 int indice_forme;
 PImage sketch_icon;
@@ -80,50 +81,63 @@ void setup() {
             // GO Attente figure dollar
               switch (mae) {
 
-                case ECOUTE_INIT:  // Etat INITIAL
+                case ECOUTE_INIT :  // Etat INITIAL
                   if(args[0].contains("creer")) {
                     mae=FSM.ATTENTE_DOLLAR;
                   }
                   break;
                 case ATTENTE_COL_POS:
                   String[] param = args[0].split(" ", 2); //envie de gerber 
+                  int x = 0;
+                  int y = 0;
+                  //TODO position aleatoire selon zone
                   if(param[0].contains("couleur:aleatoire") && param[1].contains("pose")) { //Couleur aleatoire position donnee
+                    temp_forme.setColor(color(random(0,255),random(0,255),random(0,255))); //couleur aleatoire
                     if(param[1].contains("haut")) {
-                      int x = 400;
-                      int y = 100;
-                      Point p = new Point(x, y);
-                      print(formes.get(formes.size() - 1).toString());
-                      formes.get(formes.size() - 1).setLocation(p);
-                      formes.get(formes.size() - 1).setColor(color(random(0,255),random(0,255),random(0,255)));
-                      print(formes.get(formes.size() - 1).toString());
+                      x = 400;
+                      y = 100;
                     } else if(param[1].contains("bas")) {
-                    
+                      x = 400;
+                      y = 400;
                     } else if(param[1].contains("droite")) {
-                      
+                      x = 700;
+                      y = 250;
                     } else {
-                    
+                      x = 100;
+                      y = 250;
                     }
                   } else if(!(param[0].contains("aleatoire")) && param[1].contains("position")) { //Couleur donnee position aleatoire
-                    if(param[1].contains("haut")) {
-                      
-                    } else if(param[1].contains("bas")) {
-                    
-                    } else if(param[1].contains("droite")) {
-                      
+                    x = (int)(Math.random() * (750 - 50 + 1) + 50);
+                    y = (int)(Math.random() * (550 - 50 + 1) + 50);
+                    if(param[0].contains("rouge")) {
+                      temp_forme.setColor(color(255, 0, 0));
+                    } else if(param[0].contains("vert")) {
+                      temp_forme.setColor(color(0, 255, 0));
+                    } else if(param[0].contains("bleu")) {
+                      temp_forme.setColor(color(0, 0, 255));
                     } else {
                     
                     }
                   } else if(!(param[0].contains("aleatoire")) && !(param[0].contains("aleatoire"))) { //Couleur et pos donnees
                     
                   } else {  //Couleur et pos aleatoire
-                    //Point aleatoire deja instancie dans le bind OneDollar
                     print("Tout aléatoire");
-                    
+                    temp_forme.setColor(color(random(0,255),random(0,255),random(0,255))); //couleur aleatoire
+                    x = (int)(Math.random() * (750 - 50 + 1) + 50);
+                    y = (int)(Math.random() * (550 - 50 + 1) + 50);
                   }
+                  
+                  Point p = new Point(x, y);
+                  temp_forme.setLocation(p); //maj position
+                  formes.add(temp_forme); //ajout de la nouvelle forme
+                  
                   mae=FSM.AFFICHER_FORMES;
                   break;
                   
                 case AFFICHER_FORMES:
+                  if(args[0].contains("creer")) {
+                    mae=FSM.ATTENTE_DOLLAR;
+                  }
                   break;
                 case ATTENTE_DOLLAR:
                   break;
@@ -159,21 +173,19 @@ void setup() {
           if (float(args[1].replace(',', '.')) > CONFIDENCE_ONEDOLLAR){
             println(message);
             if(mae == FSM.ATTENTE_DOLLAR){
-              int rand_x = (int)(Math.random() * (750 - 50 + 1) + 50);
-              int rand_y = (int)(Math.random() * (550 - 50 + 1) + 50);
-              Point p = new Point(rand_x,rand_y);
+              Point p = new Point(0,0);
               
               if(args[0].contains("rectangle")) {
                 Forme f = new Rectangle(p);
-                formes.add(f);
+                temp_forme = f;
                 
                 mae = FSM.ATTENTE_COL_POS;
               } else if (args[0].contains("circle")) {
                 Forme f2 = new Cercle(p);
-                formes.add(f2);
+                temp_forme = f2;
                 
                 mae = FSM.ATTENTE_COL_POS;
-              }
+              } 
             }
           }
         }        
@@ -183,8 +195,8 @@ void setup() {
 }
 
 void draw() {
-  background(0);
-  //println("MAE : " + mae + " indice forme active ; " + indice_forme);
+  background(255);
+  println("MAE : " + mae);
   switch (mae) {
     case INITIAL:  // Etat INITIAL
       background(255);
@@ -208,13 +220,12 @@ void draw() {
     case AFFICHER_FORMES:  // 
     case DEPLACER_FORMES_SELECTION: 
     case DEPLACER_FORMES_DESTINATION: 
-      affiche();
-      
       break;   
       
     default:
       break;
   }  
+   affiche();
 }
 
 // fonction d'affichage des formes m
