@@ -48,7 +48,7 @@
 		<item>a droite <tag>out.text = "pose:droite ";</tag> </item>
 		<item>aleatoire</item>
     </one-of> 
-	<tag>out.text = " " + "pose:" + meta.current().text + " ";</tag>
+	<tag>out.text = "pose:" + meta.current().text + " ";</tag>
  </rule>
 
  <rule id="color">
@@ -59,6 +59,6 @@
 	  <item>de cette couleur</item>
 	  <item>aleatoire</item>
     </one-of>
-	<tag>out.text = " " + "couleur:" + meta.current().text + " ";</tag>
+	<tag>out.text = "couleur:" + meta.current().text + " ";</tag>
 </rule>
 </grammar>

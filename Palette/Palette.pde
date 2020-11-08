@@ -87,26 +87,31 @@ void setup() {
                   }
                   break;
                 case ATTENTE_COL_POS:
-                  String[] param = args[0].split(" ", 2); //envie de gerber 
+                  
+                  String[] param = args[0].split(" ", 2); 
+                  print("Param split " + param[0] + " " + param[1]+"\n");
+                  
                   int x = 0;
                   int y = 0;
                   //TODO position aleatoire selon zone
                   if(param[0].contains("couleur:aleatoire") && param[1].contains("pose")) { //Couleur aleatoire position donnee
+                    float r1 = random(-50, 50);
+                    float r2 = random(-50, 50);
                     temp_forme.setColor(color(random(0,255),random(0,255),random(0,255))); //couleur aleatoire
                     if(param[1].contains("haut")) {
-                      x = 400;
-                      y = 100;
+                      x = int(400+r1);
+                      y = int(100+r2);
                     } else if(param[1].contains("bas")) {
-                      x = 400;
-                      y = 400;
+                      x = int(400+r1);
+                      y = int(500+r2);
                     } else if(param[1].contains("droite")) {
-                      x = 700;
-                      y = 250;
+                      x = int(700+r1);
+                      y = int(100+r2);
                     } else {
-                      x = 100;
-                      y = 250;
+                      x = int(100+r1);
+                      y = int(300+r2);
                     }
-                  } else if(!(param[0].contains("aleatoire")) && param[1].contains("position")) { //Couleur donnee position aleatoire
+                  } else if((!(param[0].contains("aleatoire"))) && param[1].contains("position:aleatoire")) { //Couleur donnee position aleatoire
                     x = (int)(Math.random() * (750 - 50 + 1) + 50);
                     y = (int)(Math.random() * (550 - 50 + 1) + 50);
                     if(param[0].contains("rouge")) {
@@ -119,8 +124,33 @@ void setup() {
                     
                     }
                   } else if(!(param[0].contains("aleatoire")) && !(param[0].contains("aleatoire"))) { //Couleur et pos donnees
+                    if(param[0].contains("rouge")) {
+                      temp_forme.setColor(color(255, 0, 0));
+                    } else if(param[0].contains("vert")) {
+                      temp_forme.setColor(color(0, 255, 0));
+                    } else if(param[0].contains("bleu")) {
+                      temp_forme.setColor(color(0, 0, 255));
+                    } else {
                     
-                  } else {  //Couleur et pos aleatoire
+                    }
+                    
+                    float r1 = random(-50, 50);
+                    float r2 = random(-50, 50);
+                    if(param[1].contains("haut")) {
+                      x = int(400+r1);
+                      y = int(100+r2);
+                    } else if(param[1].contains("bas")) {
+                      x = int(400+r1);
+                      y = int(500+r2);
+                    } else if(param[1].contains("droite")) {
+                      x = int(700+r1);
+                      y = int(100+r2);
+                    } else {
+                      x = int(100+r1);
+                      y = int(300+r2);
+                    }
+                    
+                  } else if((param[0].contains("aleatoire")) && (param[0].contains("aleatoire"))){  //Couleur et pos aleatoire
                     print("Tout aléatoire");
                     temp_forme.setColor(color(random(0,255),random(0,255),random(0,255))); //couleur aleatoire
                     x = (int)(Math.random() * (750 - 50 + 1) + 50);
@@ -129,17 +159,20 @@ void setup() {
                   
                   Point p = new Point(x, y);
                   temp_forme.setLocation(p); //maj position
-                  formes.add(temp_forme); //ajout de la nouvelle forme
-                  
+                  formes.add(temp_forme); //ajout de la nouvelle forme                  
                   mae=FSM.AFFICHER_FORMES;
                   break;
                   
                 case AFFICHER_FORMES:
                   if(args[0].contains("creer")) {
                     mae=FSM.ATTENTE_DOLLAR;
+                  } else if (args[0].contains("supprimer")) {
+                    mae=FSM.SUPPRIMER;
                   }
                   break;
                 case ATTENTE_DOLLAR:
+                  break;
+                case SUPPRIMER:
                   break;
                 case DEPLACER_FORMES_SELECTION: 
                   break;
@@ -170,7 +203,7 @@ void setup() {
         {
           message = "Dessin:" + args[0] + " et confiance:" + args[1];
           
-          if (float(args[1].replace(',', '.')) > CONFIDENCE_ONEDOLLAR){
+          if (float(args[1].replace(',', '.')) > 0.5){
             println(message);
             if(mae == FSM.ATTENTE_DOLLAR){
               Point p = new Point(0,0);
@@ -185,7 +218,12 @@ void setup() {
                 temp_forme = f2;
                 
                 mae = FSM.ATTENTE_COL_POS;
-              } 
+              } else if (args[0].contains("triangle")) {
+                Forme f3 = new Triangle(p);
+                temp_forme = f3;
+                
+                mae = FSM.ATTENTE_COL_POS;
+              }
             }
           }
         }        
@@ -267,6 +305,15 @@ void mousePressed() { // sur l'événement clic
      mae=FSM.AFFICHER_FORMES;
      break;
      
+   case SUPPRIMER:
+     for (int i=0;i<formes.size();i++) { // we're trying every object in the list        
+        if ((formes.get(i)).isClicked(p)) {
+          indice_forme = i;
+          formes.remove(indice_forme);
+          mae = FSM.AFFICHER_FORMES;
+        }         
+     }
+     break;
     default:
       break;
   }
