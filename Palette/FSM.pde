@@ -5,8 +5,8 @@
  */
  
 public enum FSM {
-  INITIAL, /* Etat Initial */
-  ECOUTE_INIT,
+  INITIAL,
+  ECOUTE_INIT,/* Etat Initial */
   ATTENTE_DOLLAR,
   ATTENTE_COL_POS,
   SUPPRIMER,

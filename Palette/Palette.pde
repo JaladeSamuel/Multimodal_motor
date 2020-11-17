@@ -93,7 +93,6 @@ void setup() {
                   
                   int x = 0;
                   int y = 0;
-                  //TODO position aleatoire selon zone
                   if(param[0].contains("couleur:aleatoire") && param[1].contains("pose")) { //Couleur aleatoire position donnee
                     float r1 = random(-50, 50);
                     float r2 = random(-50, 50);
@@ -168,6 +167,8 @@ void setup() {
                     mae=FSM.ATTENTE_DOLLAR;
                   } else if (args[0].contains("supprimer")) {
                     mae=FSM.SUPPRIMER;
+                  } else if (args[0].contains("deplacer")) {
+                    mae=FSM.DEPLACER_FORMES_SELECTION;
                   }
                   break;
                 case ATTENTE_DOLLAR:
@@ -177,6 +178,56 @@ void setup() {
                 case DEPLACER_FORMES_SELECTION: 
                   break;
                 case DEPLACER_FORMES_DESTINATION: 
+                  if(args[0].contains("en haut")) {
+                    float r1 = random(-50, 50);
+                    float r2 = random(-50, 50);
+                    x = int(400+r1);
+                    y = int(100+r2);
+                    if(indice_forme !=-1){
+                      (formes.get(indice_forme)).setLocation(new Point(x, y));
+                      indice_forme=-1;
+                    }
+                    mae=FSM.AFFICHER_FORMES;
+                  }else if(args[0].contains("en bas")) {
+                    float r1 = random(-50, 50);
+                    float r2 = random(-50, 50);
+                    x = int(400+r1);
+                    y = int(500+r2);
+                    if(indice_forme !=-1){
+                      (formes.get(indice_forme)).setLocation(new Point(x, y));
+                      indice_forme=-1;
+                    }
+                    mae=FSM.AFFICHER_FORMES;
+                  } else if(args[0].contains("a droite")) {
+                    float r1 = random(-50, 50);
+                    float r2 = random(-50, 50);
+                    x = int(700+r1);
+                    y = int(100+r2);
+                    if(indice_forme !=-1){
+                      (formes.get(indice_forme)).setLocation(new Point(x, y));
+                      indice_forme=-1;
+                    }
+                    mae=FSM.AFFICHER_FORMES;
+                  } else if(args[0].contains("a gauche")) {
+                    float r1 = random(-50, 50);
+                    float r2 = random(-50, 50);
+                    x = int(100+r1);
+                    y = int(300+r2);
+                    if(indice_forme !=-1){
+                      (formes.get(indice_forme)).setLocation(new Point(x, y));
+                      indice_forme=-1;
+                    }
+                    mae=FSM.AFFICHER_FORMES;
+                  } else if(args[0].contains("aleatoire")) {
+                    x = (int)(Math.random() * (750 - 50 + 1) + 50);
+                    y = (int)(Math.random() * (550 - 50 + 1) + 50);
+                    if(indice_forme !=-1){
+                      (formes.get(indice_forme)).setLocation(new Point(x, y));
+                      indice_forme=-1;
+                    }
+                    mae=FSM.AFFICHER_FORMES;
+                  }
+                 
                   break;
                 case INITIAL:
                   break;
@@ -269,6 +320,40 @@ void draw() {
 // fonction d'affichage des formes m
 void affiche() {
   background(255);
+  switch (mae) {
+    case ECOUTE_INIT:
+      fill(0);
+      text("En attente d'une commande vocale (sra5): Créer|Déplacer|Supprimer", 1,10);
+      break;
+    case ATTENTE_DOLLAR:
+      fill(0);
+      text("En attente d'un dessin de forme (oneDollar): Rectangle|Circle|Triangle", 1,10);
+      break;
+    case ATTENTE_COL_POS:
+      fill(0);
+      text("En attente d'une couleur et/ou position (sra5): ((bleu|vert|rouge|ne rien dire) || (en haut|en bas|a gauche|a droite|ne rien dire)) | aleatoire", 1,10);
+      break;
+    case SUPPRIMER:
+      fill(0); 
+      text("En attente d'un clic sur la forme que vous voulez supprimer", 1,10);
+      break; 
+    case DEPLACER_FORMES_SELECTION: 
+      fill(0); 
+      text("En attente d'un clic sur la forme que vous voulez deplacer", 1,10);
+      break;
+    case DEPLACER_FORMES_DESTINATION: 
+      fill(0); 
+      text("En attente d'un clic vers la destination ou commande vocale en haut|en bas|a droite|a gauche|aleatoire", 1,10);
+      break;
+    case AFFICHER_FORMES: 
+      fill(0); 
+      text("En attente d'une commande vocale (sra5): Créer|Déplacer|Supprimer", 1,10);
+      break;   
+      
+    default:
+      break;
+  }  
+  //text("Etat initial", 1,10);
   /* afficher tous les objets */
   for (int i=0;i<formes.size();i++) // on affiche les objets de la liste
     (formes.get(i)).update();
