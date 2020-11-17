@@ -60,11 +60,22 @@ void setup() {
       public void receive(IvyClient client,String[] args)
       { 
         message = args[0]; 
-        if(message=="case1"){
-          action_creer = true;
-        }
-        if(message=="case2"){
-          action_deplacer = true;
+        switch (mae) {
+          case ECOUTE_INIT:
+            if(message=="case1"){
+              mae=FSM.ATTENTE_DOLLAR;
+            }
+          case AFFICHER_FORMES: 
+            if(message.equals("case1")) {
+              mae=FSM.ATTENTE_DOLLAR;
+            } else if (message.equals("case2")) {
+              mae=FSM.SUPPRIMER;
+            } else if (args[0].contains("case3")) {
+              mae=FSM.DEPLACER_FORMES_SELECTION;
+            }
+            break;   
+          default:
+            break;
         }  
       }        
     });
@@ -87,7 +98,6 @@ void setup() {
                   }
                   break;
                 case ATTENTE_COL_POS:
-                  
                   String[] param = args[0].split(" ", 2); 
                   print("Param split " + param[0] + " " + param[1]+"\n");
                   
@@ -171,12 +181,6 @@ void setup() {
                     mae=FSM.DEPLACER_FORMES_SELECTION;
                   }
                   break;
-                case ATTENTE_DOLLAR:
-                  break;
-                case SUPPRIMER:
-                  break;
-                case DEPLACER_FORMES_SELECTION: 
-                  break;
                 case DEPLACER_FORMES_DESTINATION: 
                   if(args[0].contains("en haut")) {
                     float r1 = random(-50, 50);
@@ -227,15 +231,12 @@ void setup() {
                     }
                     mae=FSM.AFFICHER_FORMES;
                   }
-                 
-                  break;
-                case INITIAL:
                   break;
               }
           }
           
         }        
-      }); //fin bind
+      }); //fin bind sra5
     
     //sra5 rejected
     bus.bindMsg("^sra5 Event=Speech_Rejected", new IvyMessageListener()
@@ -323,7 +324,7 @@ void affiche() {
   switch (mae) {
     case ECOUTE_INIT:
       fill(0);
-      text("En attente d'une commande vocale (sra5): Créer|Déplacer|Supprimer", 1,10);
+      text("En attente d'une commande vocale (sra5) : créer", 1,10);
       break;
     case ATTENTE_DOLLAR:
       fill(0);
@@ -347,7 +348,7 @@ void affiche() {
       break;
     case AFFICHER_FORMES: 
       fill(0); 
-      text("En attente d'une commande vocale (sra5): Créer|Déplacer|Supprimer", 1,10);
+      text("En attente d'une commande vocale (sra5) ou geste (leap motion) : Créer|Déplacer|Supprimer", 1,10);
       break;   
       
     default:
