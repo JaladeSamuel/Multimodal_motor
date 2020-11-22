@@ -60,7 +60,7 @@ void draw()
       
       if(x_leap > 210 && y_leap < -85){
         try{
-          bus.sendMsg("Demo_Processing Command=case2");
+          bus.sendMsg("leap_motion Command=case2");
         }
         catch (IvyException ie){}
         println("case2");
@@ -69,7 +69,7 @@ void draw()
       
       if(x_leap < -180 && y_leap > 70){
         try{
-          bus.sendMsg("Demo_Processing Command=case3");
+          bus.sendMsg("leap_motion Command=case3");
         }
         catch (IvyException ie){}
         println("case3");
@@ -78,7 +78,7 @@ void draw()
       
       if(x_leap > 200 && y_leap > 70){
         try{
-          bus.sendMsg("Demo_Processing Command=case4");
+          bus.sendMsg("leap_motion Command=case4");
         }
         catch (IvyException ie){}
         println("case4");
